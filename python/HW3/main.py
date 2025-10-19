@@ -65,9 +65,9 @@ class Order:
     def return_product(self, product, quantity):
         if quantity > self.products[product] + product.stock:
             quantity = int(self.products[product])
-            if quantity > 0 & quantity < self.products[product] + product.stock:
-                self.products[product] -= quantity
-                product.update_stock(+quantity)
+        if quantity > 0 & quantity < self.products[product] + product.stock:
+            self.products[product] -= quantity
+            product.update_stock(+quantity)
         else:
             product.update_stock(self.products[product])
         
@@ -127,6 +127,6 @@ if __name__ == "__main__":
     print("\n")
     store.list_products()
 
-    order.return_product(product1, 6)
+    order.return_product(product1, 2)
     print(order)
     store.list_products()
