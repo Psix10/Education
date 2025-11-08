@@ -1,0 +1,12 @@
+{
+    "last_name": "Пупа",
+    "first_name": "Задупа",
+    "date_born": "2025-11-08",
+    "date_create": "2025-11-08T22:14:31.805788",
+    "phone": "+79292223344",
+    "email": "user@example.com",
+    "id": 1,
+    "reason": [
+        "нет доступа к сети"
+    ]
+}
