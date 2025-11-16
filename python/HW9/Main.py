@@ -120,8 +120,12 @@ print(db_manager.get__users_by_faculty("РЭФ"))
 
 new_stundet = User(last_name="Встанька", first_name="Ванька", faculty="СИД", course="Теор. Механика", estimation=52)
 
+
+print("\n\n******************** Пример добавление студента ***********************\n\n")
+
 db_manager.insert_user(new_stundet)
 
+print("\n\n******************** Пример добавление списка студентов ***********************\n\n")
 users_list = [
     User(last_name="Петров", first_name="Пётр", faculty="ФПМИ", course="Мат. Анализ", estimation=48),
     User(last_name="Сидоров", first_name="Сидор", faculty="ФТФ", course="Физика", estimation=37)
