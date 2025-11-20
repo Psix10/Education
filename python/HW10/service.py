@@ -4,14 +4,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import (
     IntegrityError, 
     DataError, 
-    OperationalError, 
-    ProgrammingError, 
+    OperationalError,  
     InvalidRequestError
 )
-from sqlalchemy import select
+from sqlalchemy import select, distinct, desc
 from uuid import UUID, uuid4
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID
-from sqlalchemy.orm import Session
 from typing import NoReturn, List
 from models import *
 from base import *
@@ -96,9 +93,14 @@ class DataBaseManager:
             stmt = await session.execute(select(User).where(User.course == course))
             return stmt.scalars().all()
 
-    async def get__users_by_id(self, uuid: UUID) -> List[User]:
+    async def get__users_by_id(self, uuid: UUID) -> User:
         async with async_session_maker() as session:
             stmt = await session.execute(select(User).where(User.id == uuid))
+            return stmt.scalars().first()
+    
+    async def get__users_by_first_name_last_name_faculty(self, last_name:str, first_name: str, faculty: str) -> List[User]:
+        async with async_session_maker() as session:
+            stmt = await session.execute(select(User).where((User.last_name == last_name) & (User.first_name == first_name) & (User.faculty == faculty)))
             return stmt.scalars().all()
 
     async def get_average_score(self, faculty: str) -> float:
@@ -112,10 +114,38 @@ class DataBaseManager:
             stmt = await session.execute(select(User).where((User.course == course) & (User.estimation < threshold)))
             return stmt.scalars().all()
 
-    async def get_last_10_users(limit: int = 10) -> List[User]:
+    async def get_unique_course(self) -> List[User]:
         async with async_session_maker() as session:
-            result = await session.execute(select(User).order_by(desc(User.id)).limit(limit))
+            stmt = select(distinct(User.course))
+            result = await session.execute(stmt)
+            course = [row[0] for row in result.all()]
+        return course
+    
+    async def get_all_users(self):
+        async with async_session_maker() as session:
+            result = await session.execute(select(User))
             return result.scalars().all()
+
+    async def update_user(self, user_id: UUID, user_data: UserResponse):
+        async with async_session_maker() as session:
+            user = await self.get__users_by_id(user_id)
+            if not user:
+                return {"message": "User not found"}
+            for field, value in user_data.dict(exclude_unset=True).items():
+                setattr(user, field, value)
+            session.add(user)
+            await session.commit()
+            await session.refresh(user)
+            return user
+
+    async def delete_user(self, user_id: UUID):
+        async with async_session_maker() as session:
+            user = await self.get__users_by_id(user_id)
+            if not user:
+                return False
+            await session.delete(user)
+            await session.commit()
+            return True
 
 def get_manager():
     return DataBaseManager()

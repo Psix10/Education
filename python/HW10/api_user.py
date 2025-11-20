@@ -6,7 +6,22 @@ from models import *
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
-@router.post("/adduser", response_model=None, status_code=status.HTTP_200_OK)
+@router.post("/addlistuser", response_model=None, status_code=status.HTTP_200_OK, description="Добавление студента списком")
+async def add_user(users: List[UserCreate], db_manager: DataBaseManager = Depends(get_manager)) -> dict:
+    users_list = [
+        User(
+        last_name=user.last_name,
+        first_name=user.first_name,
+        faculty=user.faculty,
+        course=user.course,
+        estimation=user.estimation
+        )
+        for user in users
+    ]
+    await db_manager.insert_users(users_list)
+    return {"message": "User added successfully"}
+
+@router.post("/adduser", response_model=None, status_code=status.HTTP_200_OK, description="Добавление студента")
 async def add_user(user: UserCreate, db_manager: DataBaseManager = Depends(get_manager)) -> dict:
     new_user = User(
         last_name=user.last_name,
@@ -18,40 +33,24 @@ async def add_user(user: UserCreate, db_manager: DataBaseManager = Depends(get_m
     await db_manager.insert_user(new_user)
     return {"message": "User added successfully"}
 
-@router.post("/uniqcourse", response_model=List[UserResponse], status_code=status.HTTP_200_OK)
-async def users_by_course(course: str, db_manager: DataBaseManager = Depends(get_manager)) -> List[User]:
-    result = await db_manager.get__users_by_course(course)
+@router.get("/uniqcourse", response_model=list[str], status_code=status.HTTP_200_OK, description="Пример получения списка уникальных курсов")
+async def users_by_course(db_manager: DataBaseManager = Depends(get_manager)) -> List[User]:
+    result = await db_manager.get_unique_course()
+    return result
+
+@router.get("/facultystudents", response_model=List[UserResponse], status_code=status.HTTP_200_OK, description="Пример получения списка студентов по названию факультета")
+async def users_by_faculty(faculty: str, db_manager: DataBaseManager = Depends(get_manager)) -> List[User]:
+    result = await db_manager.get__users_by_faculty(faculty)
     return result
 
 
-    
-    print("\n\n******************** Пример получения списка уникальных курсов  ***********************\n\n")
-    c = await db_manager.get__users_by_course("Физика")
-    print(c)
+@router.get("/allusers", response_model=List[UserResponse], status_code=status.HTTP_200_OK, description="Пример получения списка студентов по названию факультета")
+async def users_by_faculty(db_manager: DataBaseManager = Depends(get_manager)) -> List[User]:
+    result = await db_manager.get_all_users()
+    return result
 
-    print("\n\n******************** Пример получения списка студентов по названию факультета ***********************\n\n")
-    d = await db_manager.get__users_by_faculty("РЭФ")
-    print(d)
+@router.get("/findidbyuserfaculty", response_model=List[UserResponse], status_code=status.HTTP_200_OK, description="Пример получения id (uuid) студента(-ов) по ФИ и факультету")
+async def find_id_by_users_by_faculty(last_name: str, first_name: str, faculty: str, db_manager: DataBaseManager = Depends(get_manager)) -> List[User]:
+    result = await db_manager.get__users_by_first_name_last_name_faculty(last_name, first_name, faculty)
+    return result
 
-    new_stundet = User(
-        last_name="Встанька", 
-        first_name="Ванька", 
-        faculty="СИД", 
-        course="Теор. Механика", 
-        estimation=52
-        )
-
-    print("\n\n******************** Пример добавление студента ***********************\n\n")
-
-    await db_manager.insert_user(new_stundet)
-
-    print("\n\n******************** Пример добавление списка студентов ***********************\n\n")
-    users_list = [
-        User(last_name="Петров", first_name="Пётр", faculty="ФПМИ", course="Мат. Анализ", estimation=48),
-        User(last_name="Сидоров", first_name="Сидор", faculty="ФТФ", course="Физика", estimation=37)
-    ]
-
-    await db_manager.insert_users(users_list)
-    
-    e = db_manager.get_last_10_users()
-    print(e)

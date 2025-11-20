@@ -3,6 +3,7 @@ from sqlalchemy import String, Float
 from sqlalchemy.orm import Mapped, mapped_column, declarative_base
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from pydantic import BaseModel
+from typing import Optional
 
 Base = declarative_base()
 
@@ -36,5 +37,15 @@ class UserResponse(BaseModel):
     course: str
     estimation: float
 
+    class Config:
+        orm_mode = True
+
+class UserUpdate(BaseModel):
+    last_name: Optional[str]
+    first_name: Optional[str]
+    faculty: Optional[str]
+    course: Optional[str]
+    estimation: Optional[float]
+    
     class Config:
         orm_mode = True
