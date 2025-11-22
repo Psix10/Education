@@ -17,15 +17,19 @@ class RefreshTokenRepository:
         self.db.add(rt)
         await self.db.commit()
         await self.db.refresh(rt)
-        return rt
+        return rt.id
     
     async def get_by_hash(self, token_hash: str) -> RefreshTokenModel | None:
         res = await self.db.execute(select(RefreshTokenModel).where(RefreshTokenModel.token_hash == token_hash))
-        return res.scalar_one_or_none
+        return res.scalar_one_or_none()
+    
+    async def get_by_id(self, id: int) -> RefreshTokenModel | None:
+        res = await self.db.execute(select(RefreshTokenModel).where(RefreshTokenModel.id == id))
+        return res.scalar_one_or_none()
     
     async def revoke(self, token_id: int) -> bool:
         res = await self.db.execute(select(RefreshTokenModel).where(RefreshTokenModel.id == token_id))
-        obj = res.scalar_one_or_none
+        obj = res.scalar_one_or_none()
         if obj:
             obj.revoked = True
             await self.db.commit()

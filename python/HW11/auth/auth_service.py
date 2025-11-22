@@ -10,6 +10,7 @@ from auth.auth_repository import UserRepository, get_user_reposetory
 from auth.auth_schema import TokenData, UserResponse
 from config import *
 from auth.auth_refresh_repository import RefreshTokenRepository, get_refresh_reposetory
+from auth.utils import make_token_plain
 
 
 security = HTTPBearer()
@@ -28,6 +29,9 @@ class AuthService:
         
     def verify_password(self, plain_password, hashed_password):
         return self.pwd_context.verify(plain_password, hashed_password)
+    
+    def hash_refresh_token(self, token: str):
+        return self.pwd_context.hash(token)
     
     async def authenticate_user(self, email: str, password: str) -> UserResponse | bool:
         user = await self.repo.get_by_email(email)
@@ -50,7 +54,7 @@ class AuthService:
             payload = jwt.decode(
                 self.credentials.credentials,
                 SECRET_KEY,
-                ALGORITHM,
+                algorithms=ALGORITHM,
             )
             email: str = payload.get("sub")
             if email is None:
@@ -75,30 +79,37 @@ class AuthService:
             
         to_encode.update({"exp" : expire})
         
-        encode_jwt = jwt.encode(to_encode, SECRET_KEY, ALGORITHM,)
+        encode_jwt = jwt.encode(
+            to_encode, 
+            SECRET_KEY, 
+            algorithm=ALGORITHM,
+        )
         
         return encode_jwt
 
     async def create_refresh_token(self, user_id: int) -> str:
-        plain = str(uuid4())
-        h = PasswordHash.recommended()
-        hash = h.hash(plain)
         if not self.refresh_repo:
             raise RuntimeError("Refresh repo not configured")
-        await self.refresh_repo.create(hash, user_id, expires_days=REFRESH_TOKEN_EXPIRE_DAYS)
-        return hash
+        plain = make_token_plain()
+        hashed = self.pwd_context.hash(plain)
+        token_id = await self.refresh_repo.create(hashed, user_id, expires_days=REFRESH_TOKEN_EXPIRE_DAYS)
+        return token_id, plain
 
-    async def verify_refresh_token(self, refresh_plain: str):
-        if not self.refresh_repo:
-            raise RuntimeError()
-        rt = await self.refresh_repo.get_by_hash(refresh_plain)
-        if not rt:
+    async def verify_refresh_token(self, cookie_value: str):
+        try:
+            id_str, plain = cookie_value.split(".", 1)
+            token_id = int(id_str)
+        except:
             return None
-        if rt.revoked:
+        rt = await self.refresh_repo.get_by_id(token_id)
+        
+        if not rt or rt.revoked or rt.expires_at < datetime.utcnow():
             return None
-        if rt.expires_at < datetime.utcnow():
+        if not self.pwd_context.verify(plain, rt.token_hash):
             return None
         user = await self.repo.get_by_id(rt.user_id)
+        if not user:
+            return None
         return {"refresh": rt, "user": user}
 
 
@@ -106,7 +117,7 @@ async def get_req_service(repo: UserRepository = Depends(get_user_reposetory), r
     return AuthService(repo, refresh_repo)
 
 async def get_auth_service(
-    repo: UserResponse = Depends(get_user_reposetory),
+    repo: UserRepository = Depends(get_user_reposetory),
     refresh_repo: RefreshTokenRepository = Depends(get_refresh_reposetory),
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ) -> AuthService:

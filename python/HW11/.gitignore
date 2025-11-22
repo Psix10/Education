@@ -1,19 +1,74 @@
-# Logs
-logs
+Python cache
+
+pycache/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+Virtual environments
+
+venv/
+env/
+.venv/
+.env/
+
+Environment files
+
+*.env
+.env. # если есть несколько конфигов
+
+Logs
+
 *.log
+logs/
 
-# Dependency directories
-node_modules/
+Database files
 
-# Build output
-dist/
-build/
+*.sqlite3
+*.db
+*.db-journal
 
-# Environment variables
-.env
+Migrations (если не хотите в репо)
 
-# IDE files
+migrations/
+
+FastAPI / Uvicorn / ASGI
+
+*.pid
+*.sock
+
+Coverage reports
+
+.coverage
+htmlcov/
+coverage.xml
+nosetests.xml
+
+MyPy / Pyre / Type checking
+
+.mypy_cache/
+.dmypy.json
+.pyre/
+
+IDEs
+
 .vscode/
 .idea/
+*.sublime-project
+*.sublime-workspace
 
-.pyc
+Jupyter
+
+.ipynb_checkpoints/
+
+Windows
+
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+Docker
+
+docker-compose.override.yml
+~.local/

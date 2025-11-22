@@ -37,7 +37,7 @@ class UserAuth(Base):
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    token_hash: Mapped[str] = mapped_column(String(128), nullable=False, unique=True)  # store hash (sha256)
+    token_hash: Mapped[str] = mapped_column(String(256), nullable=False, unique=True)  # store hash (sha256)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
