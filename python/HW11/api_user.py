@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, status
 from service import *
 from models import *
 
 from auth.depend import require_write_access
-
+from redis_m.residconnect import cache_response
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -35,22 +35,26 @@ async def add_user(user: UserCreate, db_manager: DataBaseManager = Depends(get_m
     return {"message": "User added successfully"}
 
 @router.get("/uniqcourse", response_model=list[str], status_code=status.HTTP_200_OK, description="Пример получения списка уникальных курсов")
+@cache_response(expire=120)
 async def users_by_course(db_manager: DataBaseManager = Depends(get_manager), user = Depends(require_write_access)) -> List[User]:
     result = await db_manager.get_unique_course()
     return result
 
 @router.get("/facultystudents", response_model=List[UserResponse], status_code=status.HTTP_200_OK, description="Пример получения списка студентов по названию факультета")
+@cache_response(expire=120)
 async def users_by_faculty(faculty: str, db_manager: DataBaseManager = Depends(get_manager), user = Depends(require_write_access)) -> List[User]:
     result = await db_manager.get__users_by_faculty(faculty)
     return result
 
 
 @router.get("/allusers", response_model=List[UserResponse], status_code=status.HTTP_200_OK, description="Пример получения списка студентов по названию факультета")
+@cache_response(expire=120)
 async def users_by_faculty(db_manager: DataBaseManager = Depends(get_manager), user = Depends(require_write_access)) -> List[User]:
     result = await db_manager.get_all_users()
     return result
 
 @router.get("/findidbyuserfaculty", response_model=List[UserResponse], status_code=status.HTTP_200_OK, description="Пример получения id (uuid) студента(-ов) по ФИ и факультету")
+@cache_response(expire=120)
 async def find_id_by_users_by_faculty(last_name: str, first_name: str, faculty: str, db_manager: DataBaseManager = Depends(get_manager), user = Depends(require_write_access)) -> List[User]:
     result = await db_manager.get__users_by_first_name_last_name_faculty(last_name, first_name, faculty)
     return result

@@ -1,8 +1,7 @@
 
-from typing import AsyncGenerator
-from uuid import UUID, uuid4
+from typing import AsyncGenerator, NoReturn
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from typing import NoReturn, List
+from fastapi import BackgroundTasks
 from models import Base
 
 engine = create_async_engine(
@@ -20,6 +19,8 @@ async_session_maker = async_sessionmaker(
 async def init_db() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+
+
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:

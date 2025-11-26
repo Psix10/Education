@@ -64,3 +64,10 @@ class TokenData(BaseModel):
 class Login(BaseModel):
     email: str
     password: str
+
+class IDList(BaseModel):
+    user_ids: list[int]
+    
+    model_config = ConfigDict(
+        from_attributes=True
+    )

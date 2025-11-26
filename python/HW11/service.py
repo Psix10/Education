@@ -93,9 +93,9 @@ class DataBaseManager:
             stmt = await session.execute(select(User).where(User.course == course))
             return stmt.scalars().all()
 
-    async def get__users_by_id(self, uuid: UUID) -> User:
+    async def get__users_by_id(self, id: int) -> User:
         async with async_session_maker() as session:
-            stmt = await session.execute(select(User).where(User.id == uuid))
+            stmt = await session.execute(select(User).where(User.id == id))
             return stmt.scalars().first()
     
     async def get__users_by_first_name_last_name_faculty(self, last_name:str, first_name: str, faculty: str) -> List[User]:
@@ -138,9 +138,18 @@ class DataBaseManager:
             await session.refresh(user)
             return user
 
-    async def delete_user(self, user_id: UUID):
+    async def delete_user(self, user_id: int) -> bool:
         async with async_session_maker() as session:
             user = await self.get__users_by_id(user_id)
+            if not user:
+                return False
+            await session.delete(user)
+            await session.commit()
+            return True
+        
+    async def delete_user_by_list(self, user_id: List[int]) -> bool:
+        async with async_session_maker() as session:
+            user = await self.get__users_by_id(*user_id)
             if not user:
                 return False
             await session.delete(user)

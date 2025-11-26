@@ -21,6 +21,18 @@ class User(Base):
         return (f"User(id={self.id!r}, last_name={self.last_name!r}, "
                 f"first_name={self.first_name!r}, faculty={self.faculty!r}, "
                 f"course={self.course!r}, estimation={self.estimation!r})")
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "last_name": self.last_name,
+            "first_name": self.first_name,
+            "faculty": self.faculty,
+            "course": self.course,
+            "estimation": self.estimation
+        }
+
+
 
 class UserCreate(BaseModel):
     last_name: str
@@ -30,7 +42,7 @@ class UserCreate(BaseModel):
     estimation: float
     
 class UserResponse(BaseModel):
-    id: UUID
+    id: int
     first_name: str
     last_name: str
     faculty: str
