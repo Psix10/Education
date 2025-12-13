@@ -1,0 +1,71 @@
+{
+  "2001": {
+    "new_title": "Xiaomi Redmi Note 12 Pro 8/256 Синий",
+    "new_norm": "xiaomi redmi note 12 pro 8/256 blue",
+    "matches": [
+      {
+        "catalog_id": "1001",
+        "catalog_title": "Смартфон Xiaomi Redmi Note 12 Pro 8/256GB синий",
+        "catalog_norm": "xiaomi redmi note 12 pro 8/256 gb blue",
+        "score_components": {
+          "lexical": 1.0,
+          "tfidf": 0.979
+        },
+        "score": 0.9916
+      }
+    ]
+  },
+  "2002": {
+    "new_title": "Huawei P60 Pro 12/512 Black",
+    "new_norm": "huawei p 60 pro 12/512 black",
+    "matches": [
+      {
+        "catalog_id": "1002",
+        "catalog_title": "Телефон Huawei P60 Pro 12/512GB черный",
+        "catalog_norm": "huawei p 60 pro 12/512 gb black",
+        "score_components": {
+          "lexical": 1.0,
+          "tfidf": 0.9751
+        },
+        "score": 0.9901
+      }
+    ]
+  },
+  "2003": {
+    "new_title": "Планшет IRBIS TX97 10.1 дюйм 4/64 ГБ",
+    "new_norm": "irbis tx 97 10 1 inch 4/64 gb",
+    "matches": [
+      {
+        "catalog_id": "1003",
+        "catalog_title": "Планшет Irbis TX97 10.1\" 4/64GB",
+        "catalog_norm": "irbis tx 97 10 1 inch 4/64 gb",
+        "score_components": {
+          "lexical": 1.0,
+          "tfidf": 1.0
+        },
+        "score": 1.0
+      }
+    ]
+  },
+  "2004": {
+    "new_title": "Смартфон Xiaomi Redmi 13C 4/128",
+    "new_norm": "xiaomi redmi 13 c 4/128",
+    "matches": []
+  },
+  "2005": {
+    "new_title": "Робот-пылесос Xiaomi S10+",
+    "new_norm": "robot vacuum xiaomi s 10+",
+    "matches": [
+      {
+        "catalog_id": "1004",
+        "catalog_title": "Xiaomi Robot Vacuum Cleaner S10+",
+        "catalog_norm": "xiaomi robot vacuum cleaner s 10+",
+        "score_components": {
+          "lexical": 1.0,
+          "tfidf": 0.7902
+        },
+        "score": 0.9161
+      }
+    ]
+  }
+}
